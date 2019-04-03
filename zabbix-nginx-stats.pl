@@ -48,11 +48,13 @@ my $statuscount = {
 
 	'other' => 0,
 };
-my $log_key = $ARGV[0] . ",";
+my $log_key = $ARGV[0];
 
 if (not defined $log_key) {
-  $log_key = 'default,';
+  $log_key = 'default';
 }
+
+$log_key .= ',';
 
 my $datafh = File::Temp->new();
 
