@@ -60,10 +60,14 @@ my $statuscount = {
 
 	'other' => 0,
 };
+my $log_key = @ARGV[0];
 
+if (not defined $log) {
+  $log_key = '';
+}
 
 my $datafh = File::Temp->new();
-print "tmpfile: " . $datafh->filename . "\n";
+#print "tmpfile: " . $datafh->filename . "\n";
 
 my $results = [];
 for my $cfg (@$CONFIG) {
@@ -79,11 +83,10 @@ for my $cfg (@$CONFIG) {
 }
 
 
-while(<>){
+while(<STDIN>){
   if (
     my (
-	$remote_addr,
-	$hostname,
+    $remote_addr,
 	$remote_user,
 	$time_local,
 	$request,
@@ -91,8 +94,11 @@ while(<>){
 	$body_bytes_sent,
 	$http_referer,
 	$http_user_agent,
+    $is_cf,
+    $city,
+    $country,
 	$request_time,
-	$upstream_response_time) = m/(\S+) (\S+) (\S+) \[(.*?)\]\s+"(.*?)" (\S+) (\S+) "(.*?)" "(.*?)" ([\d\.]+)(?: ([\d\.]+|-))?/
+	$upstream_response_time) = m/(\S+) (\S+) \[(.*?)\]\s+"(.*?)" (\S+) (\S+) "(.*?)" "(.*?)" "(.*?)" "(.*?)" "(.*?)" ([\d\.]+)(?: ([\d\.]+|-))?/
     ) {
 my $l = $_;
     my $time = str2time($time_local);
@@ -121,7 +127,7 @@ my $l = $_;
       $r->{body_bytes_sent}->add_data($body_bytes_sent);
       $r->{reqcount} += 1;
       if ($reqms > $SLOW_ACCESS_MIN) {
-        print "WARN SLOWREQ: $reqms: $_\n";
+        #print "WARN SLOWREQ: $reqms: $_\n";
       }
     }
   } else {
@@ -133,13 +139,7 @@ sub sendstat {
   my ($key, $value, $cfg) = @_;
 
   my $hostparam = defined $cfg->{host} ? ' -s "'.$cfg->{host}.'" ':'';
-  print $datafh (defined $cfg->{host} ? $cfg->{host} : '-') . " nginx[$key] $value\n";
-  
-  #my $cmd = "$ZABBIX_SENDER $hostparam -c $ZABBIX_CONF -k \"nginx[$key]\" -o \"$value\" >/dev/null";
-  #if ($DEBUG) {
-  #  print $cmd . "\n";
-  #}
-  #system $cmd if ! $DRYRUN;
+  print $datafh (defined $cfg->{host} ? $cfg->{host} : '-') . " nginx[$log_key$key] $value\n";
 }
 sub sendstatint {
   my ($key, $value, $cfg) = @_;
@@ -157,6 +157,7 @@ sub printstats {
   if ($obj->count() == 0) {
     return;
   }
+
   sendstatint("${prefix}_avg", $obj->sum()/$obj->count(), $cfg);
   sendstat("${prefix}_count", $obj->count(), $cfg);
   sendstatint("${prefix}_mean", $obj->mean(), $cfg);
