@@ -32,18 +32,6 @@ our $CONFIG = [
 
 eval "require '_config.pl'";
 
-# example _config.pl file:
-#[
-#  {
-#    #'filter' => sub { return $_[1] =~ /zabbix/; };
-#    filter => sub { !($_[0]->{path} =~ m|^/zabbix|); },
-#  },
-#  {
-#    host=> 'worktrail.net',
-#    filter => sub { $_[0]->{hostname} eq 'worktrail.net'; },
-#  },
-#];
-
 my $reqcount = 0;
 my $oldcount = 0;
 my $parseerrors = 0;
@@ -60,14 +48,13 @@ my $statuscount = {
 
 	'other' => 0,
 };
-my $log_key = @ARGV[0];
+my $log_key = $ARGV[0];
 
 if (not defined $log_key) {
   $log_key = '';
 }
 
 my $datafh = File::Temp->new();
-#print "tmpfile: " . $datafh->filename . "\n";
 
 my $results = [];
 for my $cfg (@$CONFIG) {
@@ -110,10 +97,6 @@ my $l = $_;
       my $r = $results->[$i]; $i += 1;
       if (!defined $path) {
         $path = '';
-      }
-      if (defined $cfg->{filter} && !$cfg->{filter}({ hostname => $hostname, path => $path })) {
-        $r->{ignored} += 1;
-        next;
       }
       if ($diff > $MAXAGE) {
         $r->{oldcount} += 1;
@@ -197,9 +180,7 @@ foreach my $cfg (@$CONFIG) {
   }
 }
 
-
 my $cmd = "$ZABBIX_SENDER -vv -c $ZABBIX_CONF -i " . $datafh->filename() . " 2>&1";
 print $cmd."\n";
 system "cp ".$datafh->filename()." /tmp/test.txt";
 system $cmd unless $DRYRUN;
-
