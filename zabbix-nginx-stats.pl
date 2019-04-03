@@ -62,7 +62,7 @@ my $statuscount = {
 };
 my $log_key = @ARGV[0];
 
-if (not defined $log) {
+if (not defined $log_key) {
   $log_key = '';
 }
 
@@ -139,6 +139,11 @@ sub sendstat {
   my ($key, $value, $cfg) = @_;
 
   my $hostparam = defined $cfg->{host} ? ' -s "'.$cfg->{host}.'" ':'';
+
+  if ($DEBUG) {
+    print $hostparam . "\n";
+  }
+
   print $datafh (defined $cfg->{host} ? $cfg->{host} : '-') . " nginx[$log_key$key] $value\n";
 }
 sub sendstatint {
