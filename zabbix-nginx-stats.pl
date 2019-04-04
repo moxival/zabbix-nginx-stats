@@ -177,7 +177,7 @@ foreach my $cfg (@$CONFIG) {
   }
 }
 
-my $cmd = "$ZABBIX_SENDER -vv -c $ZABBIX_CONF -i " . $datafh->filename() . " 2>&1";
+my $cmd = "$ZABBIX_SENDER -c $ZABBIX_CONF -i " . $datafh->filename() . " 2>&1";
 print $cmd."\n";
 system "cp ".$datafh->filename()." /tmp/test.txt";
 system $cmd unless $DRYRUN;
