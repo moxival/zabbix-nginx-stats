@@ -17,7 +17,6 @@ use File::Temp ();
 
 use lib dirname($0);
 
-our $DEBUG = 1;
 our $DRYRUN = 0;
 our $ZABBIX_SENDER = '/usr/bin/zabbix_sender';
 our $ZABBIX_CONF = '/etc/zabbix/zabbix_agentd.conf';
@@ -124,10 +123,6 @@ sub sendstat {
   my ($key, $value, $cfg) = @_;
 
   my $hostparam = defined $cfg->{host} ? ' -s "'.$cfg->{host}.'" ':'';
-
-  if ($DEBUG) {
-    print $hostparam . "\n";
-  }
 
   print $datafh (defined $cfg->{host} ? $cfg->{host} : '-') . " nginx[$log_key$key] $value\n";
 }
