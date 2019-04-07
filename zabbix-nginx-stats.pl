@@ -37,14 +37,11 @@ my $parseerrors = 0;
 my $request_time_total = 0;
 my $upstream_time_total = 0;
 my $statuscount = {
-	'301' => 0,
-	'302' => 0,
-	'200' => 0,
-	'404' => 0,
+	'2XX' => 0,
+	'3XX' => 0,
+	'4XX' => 0,
+	'5XX' => 0,
 	'403' => 0,
-	'500' => 0,
-	'503' => 0,
-
 	'other' => 0,
 };
 my $log_key = $ARGV[0];
@@ -101,6 +98,9 @@ my $l = $_;
       }
       if ($diff > $MAXAGE) {
         $r->{oldcount} += 1;
+      }
+      if ($status != '403') {
+        $status =~ s/^([0-9]{1})[0-9]{2}$/$1XX/;
       }
       $r->{statuscount}->{defined $r->{statuscount}->{$status} ? $status : 'other'} += 1;
       my $reqms = int($request_time*1000);
