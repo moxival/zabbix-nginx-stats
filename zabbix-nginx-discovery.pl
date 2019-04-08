@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
+use strict;
 our $LOG_KEYS = ['default'];
 
 eval "require './_config.pl'";
 
-$first = 1;
+my $first = 1;
 
 print "[";
 
