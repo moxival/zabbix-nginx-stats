@@ -51,8 +51,8 @@ if (not defined $log_key) {
 $log_key .= ',';
 
 my $datafh = File::Temp->new();
-
 my $results = [];
+
 for my $cfg (@$CONFIG) {
     push(@$results, {
         s_request_time  => Statistics::Descriptive::Full->new(),
@@ -124,7 +124,7 @@ sub sendstat {
 }
 sub sendstatint {
     my ($key, $value, $cfg) = @_;
-    sendstat($key, int($value + 0.5), $cfg);
+    sendstat($key, int((defined $value ? $value : 0) + 0.5), $cfg);
 }
 
 sub sendstatpercentile {
@@ -177,5 +177,6 @@ foreach my $cfg (@$CONFIG) {
 
 my $cmd = "$ZABBIX_SENDER -c $ZABBIX_CONF -i " . $datafh->filename() . " 2>&1";
 print $cmd . "\n";
+
 system "cp " . $datafh->filename() . " /tmp/test.txt";
 system $cmd unless $DRYRUN;

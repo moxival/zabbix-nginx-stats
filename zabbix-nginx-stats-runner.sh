@@ -2,8 +2,9 @@
 
 LOG=${1:-access.log}
 KEY=${2:-default}
+TMP=${3:-/tmp}
 
-DAT1=/tmp/zbxngxoff$KEY.dat
+DAT1=$TMP/zbxngxoff$KEY.dat
 ACCESSLOG=/var/log/nginx/$LOG
 dir=`dirname $0`
 
